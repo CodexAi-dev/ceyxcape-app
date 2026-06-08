@@ -47,6 +47,10 @@ logs/
 backend/uploads/
 frontend/public/uploads/
 
+# Raw database dumps (may contain real user data — never commit)
+ceyxcape_ceyDb_*.sql
+*-dump.sql
+
 # Next.js / build output in subfolders
 backend/dist/
 frontend/.next/
