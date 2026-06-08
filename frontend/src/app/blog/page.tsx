@@ -7,6 +7,7 @@ import { BLOG_POSTS } from './posts';
 export const metadata: Metadata = {
   title: 'Sri Lanka Travel Blog | Tour Tips, Guides & Stories | CeyXcape',
   description: 'Expert travel guides, itineraries, and insider tips for touring Sri Lanka. Best time to visit, travel costs, top destinations and more.',
+  alternates: { canonical: '/blog' },
 };
 
 const CATEGORIES = ['All', 'Travel Planning', 'Itineraries', 'Destinations', 'Budget Guide', 'Travel Tips'];
