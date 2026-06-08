@@ -24,8 +24,9 @@ export const SITE = {
   tagline: 'Private Sri Lanka Tours',
   description:
     'Book private Sri Lanka tours, day trips, and airport transfers with professional driver guides. Explore Sigiriya, Galle, Kandy, Ella, Yala and more.',
-  // Default share image used when a page has none of its own.
-  defaultOgImage: `${SITE_URL}/images/hero2.webp`,
+  // Default share image (1200x630) shown when a page has none of its own.
+  // Swap /images/og-default.jpg for a custom branded graphic anytime.
+  defaultOgImage: `${SITE_URL}/images/og-default.jpg`,
   locale: 'en_US',
   twitter: '@ceyxcape', // update if you have a real handle
 };

@@ -90,6 +90,31 @@ export function tourSchema(tour: Tour) {
   return data;
 }
 
+// A destination, modelled as a TouristAttraction (helps Google understand
+// location-based pages and surface them for "places to visit" queries).
+export function touristAttractionSchema(opts: {
+  name: string;
+  description: string;
+  image: string;
+  path: string;
+  region?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    name: opts.name,
+    description: opts.description,
+    image: absoluteUrl(opts.image),
+    url: absoluteUrl(opts.path),
+    address: {
+      '@type': 'PostalAddress',
+      addressRegion: opts.region,
+      addressCountry: 'LK',
+    },
+    isAccessibleForFree: false,
+  };
+}
+
 // Breadcrumb trail (Home › Tours › Tour name) — Google shows this in results.
 export function breadcrumbSchema(items: Array<{ name: string; path: string }>) {
   return {
