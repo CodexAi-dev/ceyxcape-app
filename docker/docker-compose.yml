@@ -1,0 +1,107 @@
+version: '3.9'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ceyxcape-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ceyxcape
+      MYSQL_USER: ceyxcape_user
+      MYSQL_PASSWORD: ceyxcape_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ceyxcape-network
+
+  # Redis Cache (Optional, for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: ceyxcape-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ceyxcape-network
+
+  # Nest.js Backend
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: ceyxcape-backend
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ceyxcape_user
+      DB_PASS: ceyxcape_pass
+      DB_NAME: ceyxcape
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your_jwt_secret_key_change_in_production
+      JWT_EXPIRATION: 7d
+      PORT: 3001
+      PAYHERE_SANDBOX: "true"
+      PAYHERE_MERCHANT_ID: ${PAYHERE_MERCHANT_ID}
+      PAYHERE_MERCHANT_SECRET: ${PAYHERE_MERCHANT_SECRET}
+      TWILIO_SID: ${TWILIO_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_FROM: ${TWILIO_FROM}
+    ports:
+      - "3001:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../backend/src:/app/src
+      - ../backend/node_modules:/app/node_modules
+    command: npm run start:dev
+    networks:
+      - ceyxcape-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: ceyxcape-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001/api
+      NEXT_PUBLIC_APP_NAME: CeyXcape
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ../frontend/src:/app/src
+      - ../frontend/public:/app/public
+      - ../frontend/node_modules:/app/node_modules
+    command: npm run dev
+    networks:
+      - ceyxcape-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  ceyxcape-network:
+    driver: bridge

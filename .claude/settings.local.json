@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude update *)",
+      "Bash(npm install *)",
+      "Bash(claude *)",
+      "Bash(/c/xampp/mysql/bin/mysql.exe -u root -e \"SHOW DATABASES LIKE 'ceyxcape_new'; SELECT COUNT\\(*\\) AS tours FROM ceyxcape_new.tours;\")",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(curl -s -o /dev/null -w \"health: %{http_code}\\\\n\" http://localhost:3001/api/health)",
+      "Bash(curl -s -X POST http://localhost:3001/api/inquiries -H \"Content-Type: application/json\" -d '{\"type\":\"general\",\"name\":\"Test User\",\"email\":\"test@example.com\",\"message\":\"This is a test inquiry from setup.\"}' -w \"\\\\nPOST /inquiries status: %{http_code}\\\\n\")",
+      "Bash(/c/xampp/mysql/bin/mysql.exe *)",
+      "Bash(curl -s http://localhost:3001/api/gallery -w \"\\\\nstatus: %{http_code}\\\\n\")",
+      "Bash(curl -s -o /dev/null -w \"status: %{http_code}\\\\n\" http://localhost:3001/api/admin/stats)",
+      "Bash(curl -s -o /dev/null -w \"status: %{http_code}\\\\n\" http://localhost:3001/api/tours/admin/all)",
+      "Bash(curl -s -o /tmp/login.json -w '%{http_code}' -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@ceyxcape.com\",\"password\":\"__TRACKED_VAR__\"}')",
+      "Bash(node -e \"const b=require\\('bcrypt'\\);b.hash\\('Admin@1234',10\\).then\\(h=>console.log\\(h\\)\\)\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"login Admin@1234 -> %{http_code}\\\\n\" -X POST http://localhost:3001/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@ceyxcape.com\",\"password\":\"Admin@1234\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@ceyxcape.com\",\"password\":\"Admin@1234\"}')",
+      "Bash(curl -s \"http://localhost:3001/api/tours?limit=50\")",
+      "Bash(sed -n 's/.*\\\\\\(\"image\":[^,]*\\\\\\).*/\\\\1/p')",
+      "Bash(rm -f frontend/public/uploads/tours/*.webp)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000__TRACKED_VAR__)",
+      "Bash(curl *)",
+      "Bash(echo \"EXIT=$?\")"
+    ]
+  }
+}
