@@ -16,14 +16,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node16",
-    "baseUrl": "src",
     "paths": {
-      "@/*": ["./*"],
-      "@config/*": ["./config/*"],
-      "@common/*": ["./common/*"],
-      "@database/*": ["./database/*"],
-      "@modules/*": ["./modules/*"],
-      "@types/*": ["./types/*"]
+      "@/*": ["./src/*"],
+      "@config/*": ["./src/config/*"],
+      "@common/*": ["./src/common/*"],
+      "@database/*": ["./src/database/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@types/*": ["./src/types/*"]
     }
   },
   "include": ["src/**/*"],

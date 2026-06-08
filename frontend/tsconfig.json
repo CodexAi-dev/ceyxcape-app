@@ -19,7 +19,6 @@
     "jsx": "preserve",
     "incremental": true,
     "moduleResolution": "bundler",
-    "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "plugins": [
       {
