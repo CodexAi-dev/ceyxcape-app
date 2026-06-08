@@ -29,11 +29,14 @@ In **cPanel → phpMyAdmin** (or local XAMPP):
 
 Import `database/migration-old-data.sql`.
 
-> ⚠️ This file **deletes the sample seed tours/gallery first**, then inserts the
-> real ones — so run it on a fresh DB (or accept that the 10 sample tours are
-> replaced by the 3 real ones). The admin user from `schema.sql` is kept.
+> This file runs in **MERGE mode**: it **keeps** the 10 sample tours from
+> `schema.sql` and **adds** the 3 real tours alongside them (real tours get
+> fresh IDs 11–13). Gallery images are added too.
 
-After import you should have: **3 tours, 13 gallery images.**
+After import you should have: **13 tours** (10 sample + 3 real), **13 gallery images.**
+
+> Want only the 3 real tours instead? Open `database/build-migration.js`, set
+> `REPLACE_MODE = true`, run `node database/build-migration.js`, and re-import.
 
 ---
 

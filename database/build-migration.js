@@ -81,19 +81,21 @@ function tourGallery(token) {
   }
 }
 
+// MERGE mode (default): keep the sample tours/gallery from schema.sql and
+// ADD the real ones alongside (no DELETE). Real rows get fresh auto-increment
+// IDs to avoid colliding with the samples.
+// Set REPLACE_MODE = true to instead wipe samples and keep only real data.
+const REPLACE_MODE = false;
+
 let out = `-- ============================================================
 -- CeyXcape — migration of real data from the old PHP database
 -- Maps old 'tours' + 'gallery_images' into the new schema.
--- Safe to run on the new 'ceyxcape_new' database AFTER schema.sql.
--- Re-runnable: clears existing seed rows for these tables first.
+-- Run AFTER schema.sql.
+-- Mode: ${REPLACE_MODE ? 'REPLACE (wipes samples)' : 'MERGE (keeps samples, adds real data)'}
 -- ============================================================
 USE ceyxcape_new;
 SET NAMES utf8mb4;
-
--- Remove the sample seed tours/gallery so real data isn't duplicated.
-DELETE FROM tours;
-DELETE FROM gallery_images;
-
+${REPLACE_MODE ? '\n-- Remove sample seed rows so only real data remains.\nDELETE FROM tours;\nDELETE FROM gallery_images;\n' : ''}
 -- ── Tours (${tours.length}) ─────────────────────────────────────────────
 `;
 
@@ -117,9 +119,17 @@ for (const r of tours) {
   const featured = r[20] === '1' ? 1 : 0;
   const views = r[21] || 0;
 
-  out +=
-    `INSERT INTO tours (id, tour_code, name, description, category, start_location, location, duration, price, discount_price, image, gallery, itinerary, includes, excludes, status, featured, views)\n` +
-    `VALUES (${id}, ${tour_code}, ${name}, ${description}, ${category}, ${start_location}, '${String(location).replace(/^'|'$/g, '').replace(/'/g, "\\'")}', ${duration}, ${price}, ${discount_price}, ${image}, ${gallery}, ${itinerary}, ${includes}, ${excludes}, ${status}, ${featured}, ${views});\n`;
+  const locClean = `'${String(location).replace(/^'|'$/g, '').replace(/'/g, "\\'")}'`;
+  if (REPLACE_MODE) {
+    out +=
+      `INSERT INTO tours (id, tour_code, name, description, category, start_location, location, duration, price, discount_price, image, gallery, itinerary, includes, excludes, status, featured, views)\n` +
+      `VALUES (${id}, ${tour_code}, ${name}, ${description}, ${category}, ${start_location}, ${locClean}, ${duration}, ${price}, ${discount_price}, ${image}, ${gallery}, ${itinerary}, ${includes}, ${excludes}, ${status}, ${featured}, ${views});\n`;
+  } else {
+    // Merge mode: no explicit id → auto-increments after the sample tours.
+    out +=
+      `INSERT INTO tours (tour_code, name, description, category, start_location, location, duration, price, discount_price, image, gallery, itinerary, includes, excludes, status, featured, views)\n` +
+      `VALUES (${tour_code}, ${name}, ${description}, ${category}, ${start_location}, ${locClean}, ${duration}, ${price}, ${discount_price}, ${image}, ${gallery}, ${itinerary}, ${includes}, ${excludes}, ${status}, ${featured}, ${views});\n`;
+  }
 }
 
 // ── gallery_images ────────────────────────────────────────────
@@ -136,7 +146,11 @@ for (const r of gallery) {
   const file = urlInner.split('/').pop();
   const src = "'/images/gallery/" + file.replace(/'/g, "\\'") + "'";
 
-  out += `INSERT INTO gallery_images (id, src, title, category) VALUES (${id}, ${src}, ${title}, ${category});\n`;
+  if (REPLACE_MODE) {
+    out += `INSERT INTO gallery_images (id, src, title, category) VALUES (${id}, ${src}, ${title}, ${category});\n`;
+  } else {
+    out += `INSERT INTO gallery_images (src, title, category) VALUES (${src}, ${title}, ${category});\n`;
+  }
 }
 
 fs.writeFileSync(OUT, out, 'utf8');
