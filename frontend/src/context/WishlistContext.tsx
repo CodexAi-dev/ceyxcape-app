@@ -3,61 +3,34 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { WishlistContextType } from '@/types';
 import { wishlistService } from '@/services/wishlist';
-import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+// The wishlist is stored in localStorage (the backend has no wishlist API).
+// State updates are applied immediately so the heart toggles instantly for
+// everyone, logged in or not.
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [wishlist, setWishlist] = useState<number[]>([]);
-  const { isAuthenticated } = useAuth();
 
-  // Load wishlist on mount
+  // Load the saved wishlist once on mount.
   useEffect(() => {
-    const loadWishlist = async () => {
-      if (typeof window === 'undefined') return;
-
-      if (isAuthenticated) {
-        try {
-          // Load from API if authenticated
-          const items = await wishlistService.getWishlist();
-          setWishlist(items.map((item) => item.tour_id));
-        } catch (error) {
-          // Fall back to local wishlist
-          const local = wishlistService.getLocalWishlist();
-          setWishlist(local);
-        }
-      } else {
-        // Use local wishlist for unauthenticated users
-        const local = wishlistService.getLocalWishlist();
-        setWishlist(local);
-      }
-    };
-
-    loadWishlist();
-  }, [isAuthenticated]);
+    if (typeof window === 'undefined') return;
+    setWishlist(wishlistService.getLocalWishlist());
+  }, []);
 
   const addToWishlist = (tourId: number) => {
-    if (wishlist.includes(tourId)) return;
-
-    if (isAuthenticated) {
-      wishlistService.addToWishlist(tourId).then(() => {
-        setWishlist([...wishlist, tourId]);
-      });
-    } else {
+    setWishlist((prev) => {
+      if (prev.includes(tourId)) return prev;
       wishlistService.addToLocalWishlist(tourId);
-      setWishlist([...wishlist, tourId]);
-    }
+      return [...prev, tourId];
+    });
   };
 
   const removeFromWishlist = (tourId: number) => {
-    if (isAuthenticated) {
-      wishlistService.removeFromWishlist(tourId).then(() => {
-        setWishlist(wishlist.filter((id) => id !== tourId));
-      });
-    } else {
+    setWishlist((prev) => {
       wishlistService.removeFromLocalWishlist(tourId);
-      setWishlist(wishlist.filter((id) => id !== tourId));
-    }
+      return prev.filter((id) => id !== tourId);
+    });
   };
 
   const isInWishlist = (tourId: number) => {

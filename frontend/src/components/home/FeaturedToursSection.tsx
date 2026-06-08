@@ -33,21 +33,22 @@ function TourCard({ tour }: { tour: Tour }) {
         <Image
           src={tour.image ? `/uploads/tours/${tour.image}` : '/images/default-tour.jpg'}
           alt={tour.name} fill className="object-cover" />
-        {/* Category badge */}
+        {/* Category badge — top left */}
         <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#d4af37] text-white text-xs font-bold rounded-full font-outfit">
           {tour.category}
         </span>
-        {/* Discount badge */}
+        {/* Offer label — top right */}
         {discountPct && (
-          <span className="absolute top-3 right-12 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full font-outfit">
+          <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full font-outfit">
             -{discountPct}%
           </span>
         )}
-        {/* Wishlist */}
+        {/* Wishlist — bottom right */}
         <button
-          onClick={() => inWishlist ? removeFromWishlist(tour.id) : addToWishlist(tour.id)}
-          className={`wishlist-btn absolute top-3 right-3 ${inWishlist ? 'active' : ''}`}
-          aria-label="Toggle wishlist">
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(tour.id) : addToWishlist(tour.id); }}
+          className={`wishlist-btn absolute bottom-3 right-3 ${inWishlist ? 'active' : ''}`}
+          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}>
           <svg className="w-4 h-4" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>

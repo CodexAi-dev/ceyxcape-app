@@ -27,10 +27,13 @@ export default function WishlistPage() {
           return;
         }
 
-        // Fetch all tours and filter by wishlist
-        const response = await tourService.getTours({ limit: 100 });
-        const filteredTours = response.data.filter((tour) => wishlist.includes(tour.id));
-        setTours(filteredTours);
+        // Fetch each wishlisted tour by id. This works regardless of how many
+        // total tours exist (the list endpoint caps `limit` at 50). Tours that
+        // no longer exist (404) are quietly dropped.
+        const results = await Promise.all(
+          wishlist.map((id) => tourService.getTourById(id).catch(() => null)),
+        );
+        setTours(results.filter((t): t is Tour => t !== null));
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to load wishlist');
       } finally {

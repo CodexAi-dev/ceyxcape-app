@@ -35,13 +35,10 @@ export const TourCard: React.FC<TourCardProps> = ({ tour, onClick }) => {
         {/* Image */}
         <div className="relative h-48 bg-gray-200 overflow-hidden">
           <Image
-            src={tour.image}
+            src={tour.image ? `/uploads/tours/${tour.image}` : '/images/default-tour.jpg'}
             alt={tour.name}
             fill
             className="object-cover hover:scale-110 transition duration-300"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
-            }}
           />
           {tour.featured && (
             <Badge variant="primary" className="absolute top-2 left-2">
