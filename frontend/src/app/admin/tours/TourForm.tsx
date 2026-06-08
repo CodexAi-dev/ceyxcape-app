@@ -174,7 +174,7 @@ export default function TourForm({ tourId }: { tourId?: number }) {
       {/* Includes / Excludes */}
       <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 grid sm:grid-cols-2 gap-4">
         <div>
-          <label className={label}>What's included <span className="text-gray-400 normal-case font-normal">(one per line)</span></label>
+          <label className={label}>What&apos;s included <span className="text-gray-400 normal-case font-normal">(one per line)</span></label>
           <textarea rows={5} className={`${input} resize-none`} value={form.includes} onChange={(e) => set('includes', e.target.value)} placeholder={'Professional driver guide\nAll entrance fees\nLunch'} />
         </div>
         <div>

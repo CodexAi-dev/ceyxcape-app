@@ -1,0 +1,112 @@
+# ─────────────────────────────────────────────────────────────
+# CeyXcape CI — runs on every push & pull request to main.
+# Checks BOTH apps (frontend + backend):
+#   type-check → lint → test → build → security audit
+# Steps that aren't set up yet (lint/test) won't fail the build;
+# they activate automatically once you add configs/tests.
+# ─────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# If you push again while a run is in progress, cancel the old one.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── BACKEND (Nest.js) ──
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Lint — only runs if an ESLint config exists, never fails the build.
+      - name: Lint (if configured)
+        run: |
+          if ls .eslintrc* eslint.config.* >/dev/null 2>&1; then
+            npx eslint "src/**/*.ts" --max-warnings=0 || echo "::warning::Lint reported issues"
+          else
+            echo "No ESLint config yet — skipping."
+          fi
+
+      # Tests — passes cleanly even when there are no test files yet.
+      - name: Test
+        run: npx jest --passWithNoTests
+
+      - name: Build
+        run: npm run build
+
+      # Flags dependencies with known HIGH/critical security holes.
+      # Reports but does not fail the build (advisory).
+      - name: Security audit
+        run: npm audit --audit-level=high || echo "::warning::npm audit found issues"
+
+  # ── FRONTEND (Next.js) ──
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # TypeScript type-check — catches type errors before they reach prod.
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint || echo "::warning::Lint reported issues"
+
+      - name: Test
+        run: npx jest --passWithNoTests
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api
+
+      - name: Security audit
+        run: npm audit --audit-level=high || echo "::warning::npm audit found issues"
+
+  # ── SECRET SCAN (whole repo) ──
+  # Catches accidentally-committed keys/passwords (like the Twilio key
+  # GitHub blocked earlier). Uses Gitleaks — a standard, free scanner.
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

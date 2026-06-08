@@ -233,7 +233,7 @@ function InquiryWidget({ tour }: { tour: Tour }) {
               Call
             </a>
           </div>
-          <p className="text-center text-xs text-gray-400 font-outfit mt-3">No payment now — we'll confirm availability &amp; price</p>
+          <p className="text-center text-xs text-gray-400 font-outfit mt-3">No payment now — we&apos;ll confirm availability &amp; price</p>
         </>
       )}
     </div>
@@ -486,7 +486,7 @@ export default function TourDetailPage() {
               {activeTab === 'includes' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div>
-                    <h4 className="font-playfair font-bold text-[#0f172a] text-lg mb-4">What's Included</h4>
+                    <h4 className="font-playfair font-bold text-[#0f172a] text-lg mb-4">What&apos;s Included</h4>
                     <ul className="space-y-2">
                       {(tour.includes || []).length > 0 ? tour.includes.map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm font-outfit text-gray-600">
