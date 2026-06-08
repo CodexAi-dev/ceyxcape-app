@@ -8,9 +8,19 @@ etc. are intentionally skipped.)
 
 | File | Purpose |
 |------|---------|
-| `database/schema.sql` | Creates the new tables (run this first) |
-| `database/migration-old-data.sql` | Inserts the real tours + gallery (run this second) |
-| `database/build-migration.js` | Regenerates the migration from the old dump (only if needed) |
+| `database/schema.sql` | Local/XAMPP — creates the database + tables (run first) |
+| `database/migration-old-data.sql` | Local/XAMPP — inserts real tours + gallery (run second) |
+| **`database/schema-cpanel.sql`** | **cPanel — tables only, no CREATE DATABASE (run first)** |
+| **`database/migration-old-data-cpanel.sql`** | **cPanel — real data, no USE line (run second)** |
+| `database/build-migration.js` | Regenerates the migration files (only if needed) |
+
+### cPanel hosting (IMPORTANT)
+cPanel users **cannot** create a database via SQL (`#1044 Access denied`). Instead:
+1. Create the database in **cPanel → MySQL Databases** (e.g. `ceyxcape_ceyxcape_new`)
+   and add your user with **ALL PRIVILEGES**.
+2. In phpMyAdmin, **click that database in the left sidebar first**, then go to
+   **Import** and upload **`schema-cpanel.sql`**, then **`migration-old-data-cpanel.sql`**.
+   (Use the `-cpanel` files — they omit the CREATE DATABASE / USE lines.)
 
 ---
 

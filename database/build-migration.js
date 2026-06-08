@@ -154,5 +154,15 @@ for (const r of gallery) {
 }
 
 fs.writeFileSync(OUT, out, 'utf8');
+
+// cPanel version: same data, but WITHOUT the "USE <db>;" line (cPanel users
+// select the database in phpMyAdmin first and can't switch DBs via SQL).
+const outCpanel = out
+  .replace(/^USE ceyxcape_new;\n/m, '-- (cPanel: select your database in phpMyAdmin before importing)\n')
+  .replace('Run AFTER schema.sql.', 'Run AFTER schema-cpanel.sql. Select your DB in phpMyAdmin first.');
+const OUT_CPANEL = path.join(__dirname, 'migration-old-data-cpanel.sql');
+fs.writeFileSync(OUT_CPANEL, outCpanel, 'utf8');
+
 console.log(`Wrote ${OUT}`);
+console.log(`Wrote ${OUT_CPANEL}`);
 console.log(`  tours: ${tours.length}, gallery_images: ${gallery.length}`);
