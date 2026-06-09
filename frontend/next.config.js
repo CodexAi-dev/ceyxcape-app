@@ -32,15 +32,25 @@ const nextConfig = {
     { source: '/uploads/:path*', destination: `${API_ORIGIN}/uploads/:path*` },
   ],
 
-  // Image optimization. remotePatterns lets next/image optimize images that
-  // are ultimately served from the API origin.
+  // Image optimization. Uploaded images are proxied via the /uploads rewrite
+  // (same-origin), so remotePatterns mainly covers the API host directly.
+  // The API hostname is derived from NEXT_PUBLIC_API_URL so it works on any
+  // domain without hardcoding.
   images: {
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       { protocol: 'http', hostname: 'localhost' },
-      { protocol: 'https', hostname: '**.onrender.com' },
-      { protocol: 'https', hostname: 'ceyxcape.com' },
-      { protocol: 'https', hostname: '**.ceyxcape.com' },
+      ...(() => {
+        try {
+          const h = new URL(API_ORIGIN).hostname;
+          return [
+            { protocol: 'https', hostname: h },
+            { protocol: 'https', hostname: `*.${h.replace(/^www\./, '')}` },
+          ];
+        } catch {
+          return [];
+        }
+      })(),
     ],
   },
 

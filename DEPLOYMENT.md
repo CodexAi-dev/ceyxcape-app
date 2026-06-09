@@ -1,124 +1,136 @@
-# CeyXcape Deployment Guide
+# CeyXcape Deployment Guide — All on cPanel
 
-Three pieces go to two places:
+Everything runs on your cPanel host, under ONE domain. Two Node.js apps + the
+MySQL database, all on the same server.
 
-| Piece | Goes to |
-|-------|---------|
-| **Database (MySQL)** | cPanel — ✅ already imported |
-| **Backend (Nest.js API)** | cPanel "Setup Node.js App" — same server as the DB |
-| **Frontend (Next.js)** | Vercel |
+```
+app.yourdomain.com         → Next.js frontend   (Node.js app #1)
+app.yourdomain.com/api     → Nest.js backend    (Node.js app #2)
+database                   → cPanel MySQL        ✅ already imported
+```
 
-Do them in this order: **Backend (cPanel) → Frontend (Vercel)**. The frontend
-needs the backend's URL, so the backend goes live first.
+## Safe rollout (the old site stays live!)
+
+Your old PHP site is still live at `yourdomain.com`. We deploy the NEW app to a
+**test subdomain** first, verify it, then switch the main domain later.
+
+```
+Phase 1: build/test new app at  app.yourdomain.com   (old site untouched)
+Phase 2: when happy → point yourdomain.com to the new app
+```
 
 ---
 
-## PART 1 — Backend on cPanel (Setup Node.js App)
+## STEP 0 — Create the test subdomain
 
-### 1.1 Upload the backend code
-1. In cPanel → **File Manager**, create a folder, e.g. `ceyxcape-api`
-   (put it OUTSIDE `public_html` if you can — it shouldn't be web-browsable).
-2. Upload the **`backend/`** folder contents into it. Easiest: zip the `backend`
-   folder locally (WITHOUT `node_modules` and WITHOUT `.env`), upload the zip,
-   and extract it in File Manager.
-   - ✅ Include: `src/`, `package.json`, `package-lock.json`, `tsconfig.json`
-   - ❌ Exclude: `node_modules/`, `dist/`, `.env`
+cPanel → **Domains** (or **Subdomains**) → create:
+- Subdomain: `app`  →  gives `app.yourdomain.com`
+- Note its document root folder (e.g. `/home/USER/app.yourdomain.com`).
 
-### 1.2 Create the Node.js app
-1. cPanel → **Setup Node.js App** → **Create Application**
-2. Fill in:
-   - **Node.js version:** 18 or 20
-   - **Application mode:** Production
-   - **Application root:** the folder you made (e.g. `ceyxcape-api`)
-   - **Application startup file:** `dist/main.js`
-3. Click **Create**.
+---
 
-### 1.3 Set environment variables
-In the same screen, under **Environment variables**, add (use YOUR values):
+## STEP 1 — Backend API (Node.js app #2)
 
+### 1a. Upload
+- File Manager → make a folder e.g. `ceyxcape-api` (in home dir, NOT public_html).
+- Upload `ceyxcape-backend-upload.zip`, extract it (gives `src/`, `package.json`…).
+
+### 1b. Create the Node.js app
+cPanel → **Setup Node.js App** → **Create Application**:
+- Node version: **20**
+- Mode: **Production**
+- Application root: `ceyxcape-api`
+- Application URL: choose `app.yourdomain.com` and path **`/api`**
+- Startup file: `dist/main.js`
+
+### 1c. Environment variables (add in the app screen)
 ```
-NODE_ENV          = production
-PORT              = (leave blank — cPanel sets it)
-DB_HOST           = localhost
-DB_PORT           = 3306
-DB_USER           = ceyxcape_ceyxcape         (your cPanel DB user)
-DB_PASS           = (your DB user's password)
-DB_NAME           = ceyxcape_ceyxcape_new     (the DB you imported)
-JWT_SECRET        = (a long random string — change from the dev one!)
-JWT_EXPIRATION    = 7d
-CORS_ORIGIN       = https://YOUR-VERCEL-APP.vercel.app   (set after Part 2)
-ADMIN_EMAIL       = info@ceyxcape.com
-# Email (optional — to send real inquiry emails):
-MAIL_HOST         = smtp.gmail.com
-MAIL_PORT         = 587
-MAIL_USER         = (gmail address)
-MAIL_PASSWORD     = (gmail app password)
-MAIL_FROM         = noreply@ceyxcape.com
-# Twilio (optional, for SMS):
-TWILIO_SID        = (your real sid)
-TWILIO_AUTH_TOKEN = (your real token)
+NODE_ENV     = production
+DB_HOST      = localhost
+DB_PORT      = 3306
+DB_USER      = <your cPanel DB user>
+DB_PASS      = <db password>
+DB_NAME      = ceyxcape_ceyxcape_new
+JWT_SECRET   = <long random string — NOT the dev one>
+JWT_EXPIRATION = 7d
+CORS_ORIGIN  = https://app.yourdomain.com
+ADMIN_EMAIL  = info@ceyxcape.com
+# optional email:
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USER=<gmail>
+MAIL_PASSWORD=<gmail app password>
+MAIL_FROM=noreply@ceyxcape.com
 ```
+(`DB_HOST=localhost` works — DB is on the same server. No Remote MySQL needed.)
 
-> `DB_HOST = localhost` works because the backend and database are on the SAME
-> cPanel server — no Remote MySQL needed. 🎉
-
-### 1.4 Install dependencies & build
-cPanel gives you a command to "Enter the virtual environment" (a `source ...`
-line). Open cPanel → **Terminal** (or SSH), paste that line, then run:
-
+### 1d. Install + build (cPanel Terminal/SSH)
+Copy the "enter virtual environment" command cPanel shows, run it, then:
 ```bash
-cd ~/ceyxcape-api          # your app root
-npm install                # installs dependencies
-npm run build              # compiles TypeScript → dist/
+cd ~/ceyxcape-api
+npm install
+npm run build
 ```
+Back in Setup Node.js App → **Restart**.
 
-### 1.5 Start it
-Back in **Setup Node.js App**, click **Restart**. Your API is now live at:
-```
-https://yourdomain.com/  (or a subdomain cPanel assigns)
-```
-Test it: visit `https://yourdomain.com/api/tours` — you should see JSON of tours.
-
-> Note the exact API URL cPanel gives you — you'll need it for the frontend.
+### 1e. Test
+Visit `https://app.yourdomain.com/api/tours` → should return JSON of tours. ✅
 
 ---
 
-## PART 2 — Frontend on Vercel
+## STEP 2 — Frontend (Node.js app #1)
 
-### 2.1 Import the project
-1. Go to **vercel.com** → **Add New → Project**
-2. Import your GitHub repo **CodexAi-dev/ceyxcape-app**
-3. ⚠️ **Set the Root Directory to `frontend`** (since the repo has two folders).
-   Vercel → project settings → Root Directory → `frontend`.
-4. Framework preset: **Next.js** (auto-detected).
+### 2a. Upload
+- File Manager → the subdomain's folder (e.g. `app.yourdomain.com`).
+- Upload `ceyxcape-frontend-upload.zip`, extract (gives `src/`, `public/`,
+  `package.json`, `server.js`, `next.config.js`…).
 
-### 2.2 Set environment variables (Vercel → Settings → Environment Variables)
+### 2b. Create the Node.js app
+Setup Node.js App → Create Application:
+- Node version: **20**
+- Mode: **Production**
+- Application root: the subdomain folder
+- Application URL: `app.yourdomain.com` (path `/`)
+- Startup file: **`server.js`**
+
+### 2c. Environment variables
 ```
-NEXT_PUBLIC_API_URL   = https://yourdomain.com/api    (the backend URL from 1.5)
-NEXT_PUBLIC_SITE_URL  = https://YOUR-VERCEL-APP.vercel.app   (or your real domain)
+NODE_ENV             = production
+NEXT_PUBLIC_API_URL  = https://app.yourdomain.com/api
+NEXT_PUBLIC_SITE_URL = https://app.yourdomain.com
 ```
 
-### 2.3 Deploy
-Click **Deploy**. Vercel builds and gives you a live URL.
+### 2d. Install + build (Terminal)
+```bash
+cd ~/app.yourdomain.com        # the frontend root
+npm install
+npm run build                  # creates the .next production build
+```
+Setup Node.js App → **Restart**.
+
+### 2e. Test
+Open `https://app.yourdomain.com` → homepage with real tours should load. ✅
 
 ---
 
-## PART 3 — Connect the two
+## STEP 3 — Verify on the subdomain
+- Homepage, /tours, a tour detail, /custom-tour, /gallery all load with real data.
+- Submit an inquiry → check it appears in /admin (login admin@ceyxcape.com).
+- Tour images display (served via /uploads proxy).
 
-1. Copy your live **Vercel URL** (e.g. `https://ceyxcape.vercel.app`).
-2. Back in cPanel → Setup Node.js App → env vars, set:
-   ```
-   CORS_ORIGIN = https://ceyxcape.vercel.app
-   ```
-   (comma-separate if you have multiple, e.g. add your custom domain later)
-3. **Restart** the Node.js app.
-4. Open your Vercel URL → the homepage, tours, etc. should load real data. ✅
+If all good → proceed to switch the main domain.
 
 ---
 
-## After it's live
-- **Custom domain:** add it in Vercel (Settings → Domains), then also add it to
-  `CORS_ORIGIN` and `NEXT_PUBLIC_SITE_URL`.
-- **Submit sitemap to Google:** Search Console → add property → submit
-  `https://yourdomain.com/sitemap.xml`.
-- **Rotate secrets:** use fresh JWT_SECRET / Twilio keys in production.
+## STEP 4 — Switch the main domain (when ready)
+Once confident, repoint `yourdomain.com` to the new app:
+- Easiest: in Setup Node.js App, change the frontend app's URL from
+  `app.yourdomain.com` to `yourdomain.com` (and update the two NEXT_PUBLIC_*
+  envs + the backend CORS_ORIGIN to the main domain), then rebuild/restart.
+- The old PHP site is then replaced.
+
+### After going live
+- **Submit sitemap:** Google Search Console → `https://yourdomain.com/sitemap.xml`
+- **Rotate secrets:** fresh JWT_SECRET, Twilio keys.
+- Update `CORS_ORIGIN`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_API_URL` to the
+  final domain everywhere.
