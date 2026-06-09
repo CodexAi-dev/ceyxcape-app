@@ -5,6 +5,10 @@
   "author": "CeyXcape Development Team",
   "private": true,
   "license": "ISC",
+  "main": "dist/main.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

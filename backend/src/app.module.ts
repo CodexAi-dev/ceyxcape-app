@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -28,7 +29,9 @@ import { AdminModule } from './admin/admin.module';
         username: configService.get<string>('DB_USER', 'root'),
         password: configService.get<string>('DB_PASS', ''),
         database: configService.get<string>('DB_NAME', 'ceyxcape_new'),
-        entities: ['dist/**/*.entity{.ts,.js}'],
+        // Resolve entities relative to THIS compiled file so it works no
+        // matter which directory the app is launched from (e.g. cPanel).
+        entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
         synchronize: process.env.NODE_ENV !== 'production',
         logging: false,
         charset: 'utf8mb4',
