@@ -55,3 +55,6 @@ ceyxcape_ceyDb_*.sql
 backend/dist/
 frontend/.next/
 frontend/out/
+
+# Deployment upload artifacts
+*.zip
