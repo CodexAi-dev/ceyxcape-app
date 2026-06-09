@@ -52,9 +52,11 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, config));
   }
 
+  // Bind to 0.0.0.0 so the app is reachable on hosts like Render (not just
+  // localhost). Render injects PORT; fall back to 3001 in local dev.
   const port = process.env.PORT || 3001;
-  await app.listen(port);
-  console.log(`API running at http://localhost:${port}/api`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`API running on port ${port} (prefix /api)`);
 }
 
 bootstrap();
