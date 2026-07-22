@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
@@ -10,37 +11,42 @@ export default function HeroSection() {
     <section
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       aria-label="Hero banner"
-      style={{
-        backgroundImage: 'url(/images/wild-elephants.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/20" />
-      {/* Gold bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0f172a]/60 to-transparent" />
+      {/* Background image — crisp, optimized, no zoom/crop from CSS backgrounds */}
+      <Image
+        src="/images/sigiriya1.webp"
+        alt="Sigiriya Rock Fortress rising above the Sri Lankan jungle"
+        fill
+        priority
+        quality={90}
+        sizes="100vw"
+        className="object-cover object-center"
+      />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 text-center py-24">
+      {/* Soft, balanced scrim — keeps the photo clear while text stays legible */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/45" />
+      <div className="absolute inset-0 bg-black/10" />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center py-24">
         {/* Eyebrow */}
         <div className={`inline-flex items-center gap-2 mb-6 transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <span className="w-8 h-px bg-[#d4af37]" />
-          <span className="text-[#d4af37] text-sm font-semibold tracking-[3px] uppercase font-outfit">
+          <span className="text-[#d4af37] text-sm font-semibold tracking-[3px] uppercase font-outfit drop-shadow">
             Sri Lanka&apos;s Trusted Private Tours
           </span>
           <span className="w-8 h-px bg-[#d4af37]" />
         </div>
 
-        {/* Main Heading */}
+        {/* Main Heading — refined size, soft shadow for clarity */}
         <h1 className={`font-playfair text-white mb-6 transition-all duration-700 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-          style={{ fontSize: 'clamp(2.8rem,7vw,5.5rem)', lineHeight: 1.1, fontWeight: 700 }}>
+          style={{ fontSize: 'clamp(2.4rem,5.5vw,4.5rem)', lineHeight: 1.12, fontWeight: 700, textShadow: '0 2px 24px rgba(0,0,0,0.45)' }}>
           Private Sri Lanka Tours<br />
           <span className="text-gold-gradient">with Local Driver Guide</span>
         </h1>
 
         {/* Subtitle */}
-        <p className={`text-gray-200 max-w-2xl mx-auto mb-10 text-lg leading-relaxed transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <p className={`text-gray-100 max-w-xl mx-auto mb-10 text-lg leading-relaxed transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          style={{ textShadow: '0 1px 12px rgba(0,0,0,0.5)' }}>
           Colombo city tours, day trips to Galle &amp; Sigiriya, airport transfers, and customized travel experiences across Sri Lanka.
         </p>
 
@@ -66,7 +72,7 @@ export default function HeroSection() {
 
       {/* Scroll cue */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
