@@ -68,58 +68,38 @@ export function Header() {
 
   return (
     <>
-      {/* ── Top Bar ── */}
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'h-0 overflow-hidden opacity-0' : 'h-[44px] opacity-100'
-      } bg-[#0f172a]`}>
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between text-sm">
-          <div className="flex items-center gap-5 text-gray-300">
-            <a href="tel:+94786281242" className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-              </svg>
-              +94 78 628 1242
-            </a>
-            <a href="mailto:info@ceyxcape.com" className="hidden sm:flex items-center gap-1.5 hover:text-[#d4af37] transition-colors">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-              </svg>
-              info@ceyxcape.com
-            </a>
-          </div>
-          <div className="flex items-center gap-3 text-gray-400 text-xs">
-            <span className="hidden md:block">Mon–Sat: 9AM–6PM</span>
-            <span className="w-px h-4 bg-gray-700" />
-            <span className="font-semibold text-[#d4af37]">USD</span>
-          </div>
-        </div>
-      </div>
-
       {/* ── Navbar ── */}
-      <nav className={`fixed left-0 right-0 z-40 transition-all duration-300 ${
-        scrolled ? 'top-0 shadow-lg bg-white/98 backdrop-blur-md' : 'top-[44px] bg-white shadow-sm'
-      }`} style={{ height: 75 }}>
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-6">
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        scrolled
+          ? 'shadow-[0_4px_24px_rgba(0,0,0,0.08)] bg-white/95 backdrop-blur-md'
+          : 'bg-white border-b border-gray-100'
+      }`} style={{ height: scrolled ? 68 : 76 }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-6">
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <Image src="/images/logo2.png" alt="CeyXcape Tours" width={160} height={52} className="h-12 w-auto object-contain" priority />
+            <Image src="/images/logo2.png" alt="CeyXcape Tours" width={160} height={52}
+              className={`w-auto object-contain transition-all duration-300 ${scrolled ? 'h-10' : 'h-12'}`} priority />
           </Link>
 
-          {/* Desktop Nav Links */}
-          <ul className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
-            {NAV_LINKS.map(link => (
-              <li key={link.href}>
-                <Link href={link.href} className={`px-4 py-2 rounded-lg text-sm font-semibold font-outfit transition-all duration-200 ${
-                  isActive(link.href)
-                    ? 'text-[#d4af37] bg-[#d4af37]/10'
-                    : 'text-slate-700 hover:text-[#d4af37] hover:bg-[#d4af37]/5'
-                }`}>
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+          {/* Desktop Nav Links — premium underline indicator */}
+          <ul className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+            {NAV_LINKS.map(link => {
+              const active = isActive(link.href);
+              return (
+                <li key={link.href}>
+                  <Link href={link.href}
+                    className={`relative px-3.5 py-2 text-[13px] font-semibold font-outfit tracking-wide transition-colors duration-200 ${
+                      active ? 'text-[#d4af37]' : 'text-slate-700 hover:text-[#d4af37]'
+                    }`}>
+                    {link.label}
+                    <span className={`absolute left-3.5 right-3.5 -bottom-0.5 h-0.5 bg-[#d4af37] rounded-full transition-all duration-300 ${
+                      active ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+                    }`} />
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
 
           {/* Desktop Actions */}
@@ -220,7 +200,7 @@ export function Header() {
       {/* ── Floating Search ── */}
       <div className={`fixed left-0 right-0 z-30 transition-all duration-300 ${
         searchOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none'
-      }`} style={{ top: scrolled ? 75 : 119 }}>
+      }`} style={{ top: scrolled ? 68 : 76 }}>
         <div className="max-w-2xl mx-auto px-4 py-3">
           <form onSubmit={handleSearch} className="flex gap-2 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.15)] rounded-2xl p-2 border border-[#d4af37]/20">
             <svg className="w-5 h-5 text-gray-400 self-center ml-2 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -279,7 +259,7 @@ export function Header() {
       </div>
 
       {/* ── Spacer ── */}
-      <div style={{ height: scrolled ? 75 : 119 }} className="transition-all duration-300" />
+      <div style={{ height: scrolled ? 68 : 76 }} className="transition-all duration-300" />
     </>
   );
 }

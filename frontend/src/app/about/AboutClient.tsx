@@ -2,12 +2,13 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { REVIEWS } from '@/data/reviews';
 
 const STATS = [
-  { value: '7+', label: 'Years of Excellence' },
+  { value: 'Est. 2018', label: 'Local Tour Operator' },
   { value: '50+', label: 'Destinations Covered' },
-  { value: '500+', label: 'Happy Travellers' },
-  { value: '4.9', label: 'TripAdvisor Rating' },
+  { value: 'Private', label: 'Tailor-Made Journeys' },
+  { value: '24/7', label: 'Traveller Support' },
 ];
 
 const VALUES = [
@@ -29,29 +30,8 @@ const VALUES = [
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Emma Williams',
-    country: 'United Kingdom',
-    rating: 5,
-    text: "CeyXcape transformed our honeymoon into a fairy tale. Every detail was perfect — from the stunning hotels to the incredible wildlife safaris. We'll treasure these memories forever!",
-    tour: 'Honeymoon Special',
-  },
-  {
-    name: 'John Anderson',
-    country: 'Australia',
-    rating: 5,
-    text: "Our family trip was unforgettable. The itinerary was perfectly balanced between relaxation and adventure. The kids loved it, and so did we! Couldn't ask for a better operator.",
-    tour: 'Family Adventure',
-  },
-  {
-    name: 'Sophia Brown',
-    country: 'Germany',
-    rating: 5,
-    text: 'Best solo travel experience ever! I felt safe, inspired, and completely taken care of. Highly recommend CeyXcape for anyone looking to explore Sri Lanka in style.',
-    tour: 'Cultural Explorer',
-  },
-];
+// Real customer reviews migrated from the old site. Show a few here.
+const TESTIMONIALS = REVIEWS.slice(0, 3);
 
 const GALLERY = [
   { img: '/images/sigiriya1.webp', title: 'Sigiriya Rock', tag: 'Heritage', cls: 'col-span-2 row-span-2' },
@@ -367,17 +347,9 @@ function TestimonialsSection() {
           <h2 className="font-playfair font-bold text-[#0f172a]" style={{ fontSize: 'clamp(1.8rem,4vw,2.4rem)' }}>
             What Our Travellers Say
           </h2>
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <Image src="/images/tripadvisor-logo.png" alt="TripAdvisor" width={120} height={24} className="object-contain opacity-70" />
-            <div className="flex items-center gap-1">
-              {[1,2,3,4,5].map(i => (
-                <svg key={i} className="w-4 h-4 text-[#00af87]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-              ))}
-              <span className="text-sm font-bold text-[#0f172a] font-outfit ml-1">4.9 / 5.0</span>
-            </div>
-          </div>
+          <p className="text-gray-500 font-outfit mt-3 max-w-xl mx-auto">
+            Real words from the travellers who explored Sri Lanka with us.
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => <TestimonialCard key={t.name} t={t} index={i} />)}

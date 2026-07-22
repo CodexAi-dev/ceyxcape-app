@@ -1,53 +1,9 @@
 ﻿'use client';
 import React, { useState } from 'react';
+import { REVIEWS } from '@/data/reviews';
 
-const TESTIMONIALS = [
-  {
-    name: 'Emma Williams',
-    country: 'United Kingdom',
-    flag: 'GB',
-    rating: 5,
-    text: "CeyXcape turned our honeymoon into something we could never have planned ourselves. Sigiriya at sunrise with our own guide, a private whale-watching boat off Mirissa — every single day was magical.",
-    tour: 'Honeymoon Special · 10 Days',
-    platform: 'Google',
-  },
-  {
-    name: 'Markus Bauer',
-    country: 'Germany',
-    flag: 'DE',
-    rating: 5,
-    text: "I was sceptical about private tours but this completely changed my mind. No rushed schedules, no big groups. Our driver Pradeep knew every back road and every good restaurant. Exceptional value.",
-    tour: 'Cultural Triangle · 7 Days',
-    platform: 'TripAdvisor',
-  },
-  {
-    name: 'Chloe & Tom',
-    country: 'Australia',
-    flag: 'AU',
-    rating: 5,
-    text: "Five-star service from first message to the airport drop-off. The itinerary was perfectly paced for us — we never felt rushed, never felt bored. Sri Lanka blew us away and CeyXcape made it effortless.",
-    tour: 'South Coast Explorer · 8 Days',
-    platform: 'Google',
-  },
-  {
-    name: 'Fatima Al-Hassan',
-    country: 'UAE',
-    flag: 'AE',
-    rating: 5,
-    text: "Halal food options throughout, modest hotel choices, a patient and knowledgeable guide. Everything was sorted before I even thought to ask. Will be coming back with the whole family next year.",
-    tour: 'Family Wildlife Tour · 6 Days',
-    platform: 'TripAdvisor',
-  },
-  {
-    name: 'David Park',
-    country: 'South Korea',
-    flag: 'KR',
-    rating: 5,
-    text: "Photography tour was beyond my expectations. Early morning access to Sigiriya, timing the train on the Nine Arches Bridge perfectly — they clearly knew exactly where the light would be.",
-    tour: 'Photography Highlights · 9 Days',
-    platform: 'Google',
-  },
-];
+// Real customer reviews migrated from the old site.
+const TESTIMONIALS = REVIEWS;
 
 function Stars() {
   return (
@@ -83,7 +39,7 @@ export default function TestimonialsSection() {
                 </div>
               ))}
             </div>
-            <span className="text-white/50 text-xs font-outfit ml-1">500+ happy travellers</span>
+            <span className="text-white/50 text-xs font-outfit ml-1">Real traveller reviews</span>
           </div>
         </div>
 
@@ -107,7 +63,7 @@ export default function TestimonialsSection() {
           <div className="lg:col-span-3 border border-white/10 p-8">
             <div className="flex items-start justify-between mb-6">
               <Stars />
-              <span className="text-xs text-white/30 font-outfit">{t.platform}</span>
+              <span className="text-xs text-white/30 font-outfit">Verified Review</span>
             </div>
             <blockquote className="font-playfair text-white text-lg sm:text-xl leading-relaxed mb-8">
               &ldquo;{t.text}&rdquo;
@@ -118,7 +74,7 @@ export default function TestimonialsSection() {
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">{t.name}</p>
-                <p className="text-white/40 text-xs font-outfit">{t.tour}</p>
+                <p className="text-white/40 text-xs font-outfit">{t.country}</p>
               </div>
             </div>
           </div>

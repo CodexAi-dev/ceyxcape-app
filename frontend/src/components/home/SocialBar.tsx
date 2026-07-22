@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 
 const SOCIALS = [
-  { label: 'TripAdvisor', href: 'https://www.tripadvisor.com/Attraction_Review-g304132-d34094461-Reviews-CeyXcape_Tours-Anuradhapura_North_Central_Province.html', img: '/images/tripadvisor-logo.png', color: '#00AA6C' },
+  { label: 'TripAdvisor', href: 'https://www.tripadvisor.com/Attraction_Review-g304132-d34094461-Reviews-CeyXcape_Tours-Anuradhapura_North_Central_Province.html', color: '#00AA6C',
+    icon: <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5c-2.5 0-4.9.6-7 1.7H1l1.7 1.9A4.7 4.7 0 0 0 6 16.4a4.7 4.7 0 0 0 3.6-1.7L12 17.3l2.4-2.6a4.7 4.7 0 0 0 3.6 1.7 4.7 4.7 0 0 0 3.3-8.3L23 6.2h-4c-2.1-1.1-4.5-1.7-7-1.7Zm-6 4.2a2.9 2.9 0 1 1 0 5.8 2.9 2.9 0 0 1 0-5.8Zm12 0a2.9 2.9 0 1 1 0 5.8 2.9 2.9 0 0 1 0-5.8ZM6 10.1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm12 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg> },
   { label: 'Facebook',    href: 'https://www.facebook.com/share/1GNHmqAngR/',    color: '#1877F2',
     icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> },
   { label: 'YouTube',     href: 'https://www.youtube.com/@ceyxcape',            color: '#FF0000',
@@ -18,21 +18,23 @@ const SOCIALS = [
 
 export default function SocialBar() {
   return (
-    <section className="bg-[#0f172a] py-4 border-b border-white/5" aria-label="Follow us on social media">
+    <section className="bg-[#0f172a] py-5 border-b border-white/5" aria-label="Follow us on social media">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-          <span className="text-gray-400 text-sm font-outfit">Find us on</span>
-          <div className="w-px h-4 bg-gray-700 hidden sm:block" />
-          <div className="flex items-center gap-3 flex-wrap justify-center">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+          <span className="text-gray-400 text-xs uppercase tracking-[2px] font-outfit font-semibold">
+            Connect With Us
+          </span>
+          <div className="flex items-center gap-3">
             {SOCIALS.map(s => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 group text-sm text-gray-300"
-                aria-label={s.label}>
-                {s.img
-                  ? <Image src={s.img} alt={s.label} width={20} height={20} className="w-5 h-5 object-contain" />
-                  : <span style={{ color: s.color }}>{s.icon}</span>
-                }
-                <span className="hidden sm:block text-xs font-outfit">{s.label}</span>
+                aria-label={s.label} title={s.label}
+                className="group relative w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-transparent overflow-hidden">
+                {/* Brand-color fill grows in on hover */}
+                <span className="absolute inset-0 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-full"
+                  style={{ backgroundColor: s.color }} />
+                <span className="relative z-10 flex items-center justify-center text-gray-300 group-hover:text-white transition-colors duration-300 [&>svg]:w-[18px] [&>svg]:h-[18px]">
+                  {s.icon}
+                </span>
               </a>
             ))}
           </div>

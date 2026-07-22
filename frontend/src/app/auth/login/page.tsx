@@ -82,7 +82,7 @@ export default function LoginPage() {
             </p>
 
             <div className="flex gap-6 mt-8">
-              {[['500+', 'Tours'], ['98%', 'Satisfaction'], ['5★', 'Rating']].map(([val, lab]) => (
+              {[['Private', 'Driver Guides'], ['Tailor', 'Made Tours'], ['24/7', 'Support']].map(([val, lab]) => (
                 <div key={lab}>
                   <p className="font-playfair font-bold text-[#d4af37] text-2xl">{val}</p>
                   <p className="text-white/50 text-xs font-outfit mt-0.5">{lab}</p>
