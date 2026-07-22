@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { tourService } from '@/services/tours';
 import { Tour } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
@@ -31,7 +32,7 @@ function TourCard({ tour }: { tour: Tour }) {
       {/* Image */}
       <div className="tour-card-img relative h-52">
         <Image
-          src={tour.image ? `/uploads/tours/${tour.image}` : '/images/default-tour.jpg'}
+          src={tourImageSrc(tour.image)}
           alt={tour.name} fill className="object-cover" />
         {/* Category badge — top left */}
         <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#d4af37] text-white text-xs font-bold rounded-full font-outfit">

@@ -5,7 +5,7 @@ import { Tour } from './tour.entity';
 import { QueryToursDto } from './dto/query-tours.dto';
 import { CreateTourDto } from './dto/create-tour.dto';
 import { UpdateTourDto } from './dto/update-tour.dto';
-import { TOURS_UPLOAD_DIR, deleteUploadedFile } from '../common/upload.config';
+import { deleteImage } from '../common/supabase-storage';
 
 @Injectable()
 export class ToursService {
@@ -163,29 +163,29 @@ export class ToursService {
     return { message: 'Tour deleted', id };
   }
 
-  // Set the main image (filename only). Removes the previous image file.
-  async setImage(id: number, filename: string) {
+  // Set the main image (full Storage URL). Removes the previous image.
+  async setImage(id: number, url: string) {
     const tour = await this.tourRepo.findOne({ where: { id } });
     if (!tour) throw new NotFoundException(`Tour #${id} not found`);
-    if (tour.image && tour.image !== filename) {
-      deleteUploadedFile(TOURS_UPLOAD_DIR, tour.image);
+    if (tour.image && tour.image !== url) {
+      await deleteImage(tour.image);
     }
-    tour.image = filename;
+    tour.image = url;
     return this.toResponse(await this.tourRepo.save(tour));
   }
 
-  async addGalleryImages(id: number, filenames: string[]) {
+  async addGalleryImages(id: number, urls: string[]) {
     const tour = await this.tourRepo.findOne({ where: { id } });
     if (!tour) throw new NotFoundException(`Tour #${id} not found`);
-    tour.gallery = [...(tour.gallery ?? []), ...filenames];
+    tour.gallery = [...(tour.gallery ?? []), ...urls];
     return this.toResponse(await this.tourRepo.save(tour));
   }
 
-  async removeGalleryImage(id: number, filename: string) {
+  async removeGalleryImage(id: number, url: string) {
     const tour = await this.tourRepo.findOne({ where: { id } });
     if (!tour) throw new NotFoundException(`Tour #${id} not found`);
-    tour.gallery = (tour.gallery ?? []).filter((f) => f !== filename);
-    deleteUploadedFile(TOURS_UPLOAD_DIR, filename);
+    tour.gallery = (tour.gallery ?? []).filter((f) => f !== url);
+    await deleteImage(url);
     return this.toResponse(await this.tourRepo.save(tour));
   }
 

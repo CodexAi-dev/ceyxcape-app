@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { DESTINATIONS, getDestination } from '../destinations';
 import { getToursServer } from '@/services/tours.server';
-import { SITE, absoluteUrl } from '@/config/site';
+import { SITE, absoluteUrl, tourImageSrc } from '@/config/site';
 import {
   JsonLd,
   touristAttractionSchema,
@@ -176,7 +176,7 @@ export default async function DestinationPage({
                 <Link key={t.id} href={`/tours/${t.id}`}
                   className="group bg-white overflow-hidden shadow-card border border-gray-100 flex flex-col">
                   <div className="relative h-40 overflow-hidden">
-                    <Image src={t.image ? `/uploads/tours/${t.image}` : '/images/default-tour.jpg'}
+                    <Image src={tourImageSrc(t.image)}
                       alt={t.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-4 flex flex-col flex-1">

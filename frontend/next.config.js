@@ -40,6 +40,8 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       { protocol: 'http', hostname: 'localhost' },
+      // Supabase Storage (tour + gallery images live in a public bucket).
+      { protocol: 'https', hostname: '*.supabase.co' },
       ...(() => {
         try {
           const h = new URL(API_ORIGIN).hostname;

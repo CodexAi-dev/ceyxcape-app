@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { tourService } from '@/services/tours';
 import { Tour } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
@@ -34,7 +35,7 @@ function GalleryModal({ images, startIndex, onClose }: { images: string[]; start
           </svg>
         </button>
         <div className="relative aspect-video rounded-2xl overflow-hidden">
-          <Image src={`/uploads/tours/${images[idx]}`} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
+          <Image src={tourImageSrc(images[idx])} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
         </div>
         <div className="flex items-center justify-between mt-4">
           <button onClick={() => setIdx(i => (i - 1 + images.length) % images.length)}
@@ -55,7 +56,7 @@ function GalleryModal({ images, startIndex, onClose }: { images: string[]; start
           {images.map((img, i) => (
             <button key={i} onClick={() => setIdx(i)}
               className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${i === idx ? 'border-[#d4af37]' : 'border-transparent opacity-50 hover:opacity-80'}`}>
-              <Image src={`/uploads/tours/${img}`} alt="" width={64} height={48} className="object-cover w-full h-full" />
+              <Image src={tourImageSrc(img)} alt="" width={64} height={48} className="object-cover w-full h-full" />
             </button>
           ))}
         </div>
@@ -281,7 +282,7 @@ export default function TourDetailClient({ tour }: { tour: Tour }) {
             <div className="space-y-3">
               <div className="relative rounded-2xl overflow-hidden aspect-video cursor-pointer group"
                 onClick={() => { setGalleryIndex(0); setGalleryOpen(true); }}>
-                <Image src={mainImage ? `/uploads/tours/${mainImage}` : '/images/default-tour.jpg'}
+                <Image src={tourImageSrc(mainImage)}
                   alt={tour.name} fill priority className="object-cover transition-transform duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs font-outfit px-3 py-1.5 rounded-full flex items-center gap-1.5">
@@ -302,7 +303,7 @@ export default function TourDetailClient({ tour }: { tour: Tour }) {
                   {allImages.slice(0, 4).map((img, i) => (
                     <div key={i} className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group"
                       onClick={() => { setMainImage(img); setGalleryIndex(i); }}>
-                      <Image src={`/uploads/tours/${img}`} alt="" fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <Image src={tourImageSrc(img)} alt="" fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
                       {i === 3 && allImages.length > 4 && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center"
                           onClick={e => { e.stopPropagation(); setGalleryIndex(3); setGalleryOpen(true); }}>

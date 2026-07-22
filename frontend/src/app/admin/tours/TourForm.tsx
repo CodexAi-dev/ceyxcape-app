@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { useRouter } from 'next/navigation';
 import { adminService } from '@/services/admin';
 import { Tour } from '@/types';
@@ -219,7 +220,7 @@ export default function TourForm({ tourId }: { tourId?: number }) {
               <label className={label}>Main image</label>
               <div className="flex items-center gap-4">
                 <div className="relative w-28 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                  <Image src={image ? `/uploads/tours/${image}` : '/images/default-tour.jpg'} alt="Main" fill className="object-cover" sizes="112px" unoptimized />
+                  <Image src={tourImageSrc(image)} alt="Main" fill className="object-cover" sizes="112px" unoptimized />
                 </div>
                 <div>
                   <input ref={imageInput} type="file" accept="image/*" hidden
@@ -239,7 +240,7 @@ export default function TourForm({ tourId }: { tourId?: number }) {
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {gallery.map((g) => (
                   <div key={g} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group">
-                    <Image src={`/uploads/tours/${g}`} alt="" fill className="object-cover" sizes="120px" unoptimized />
+                    <Image src={tourImageSrc(g)} alt="" fill className="object-cover" sizes="120px" unoptimized />
                     <button type="button" onClick={() => removeGalleryImage(g)}
                       className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>

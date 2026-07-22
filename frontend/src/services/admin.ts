@@ -90,9 +90,9 @@ export const adminService = {
     files.forEach((f) => fd.append('files', f));
     return upload<Tour>(`/tours/${id}/gallery`, fd);
   },
-  removeTourGalleryImage: async (id: number, filename: string): Promise<Tour> => {
+  removeTourGalleryImage: async (id: number, image: string): Promise<Tour> => {
     const { data } = await api.delete<Tour>(
-      `/tours/${id}/gallery/${encodeURIComponent(filename)}`,
+      `/tours/${id}/gallery?image=${encodeURIComponent(image)}`,
     );
     return data;
   },

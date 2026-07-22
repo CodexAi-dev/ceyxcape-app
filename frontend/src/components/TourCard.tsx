@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { Tour } from '@/types';
 import { formatCurrency, truncateText } from '@/utils/formatting';
 import { useWishlist } from '@/context/WishlistContext';
@@ -35,7 +36,7 @@ export const TourCard: React.FC<TourCardProps> = ({ tour, onClick }) => {
         {/* Image */}
         <div className="relative h-48 bg-gray-200 overflow-hidden">
           <Image
-            src={tour.image ? `/uploads/tours/${tour.image}` : '/images/default-tour.jpg'}
+            src={tourImageSrc(tour.image)}
             alt={tour.name}
             fill
             className="object-cover hover:scale-110 transition duration-300"

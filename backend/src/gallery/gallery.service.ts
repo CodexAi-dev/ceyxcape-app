@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GalleryImage } from './gallery-image.entity';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
-import { GALLERY_UPLOAD_DIR, deleteUploadedFile } from '../common/upload.config';
+import { deleteImage } from '../common/supabase-storage';
 
 // The curated images that already ship in frontend/public — seeded once so the
 // public gallery looks identical, then fully manageable from the admin panel.
@@ -60,9 +60,9 @@ export class GalleryService implements OnModuleInit {
     return this.repo.find({ order: { id: 'ASC' } });
   }
 
-  async create(filename: string, dto: CreateGalleryDto) {
+  async create(src: string, dto: CreateGalleryDto) {
     const img = this.repo.create({
-      src: `/images/gallery/${filename}`,
+      src, // full Supabase Storage URL
       title: dto.title || 'CeyXcape Sri Lanka',
       category: dto.category || 'Gallery',
     });
@@ -72,10 +72,8 @@ export class GalleryService implements OnModuleInit {
   async remove(id: number) {
     const img = await this.repo.findOne({ where: { id } });
     if (!img) throw new NotFoundException(`Image #${id} not found`);
-    // Only delete the physical file for admin-uploaded gallery images.
-    if (img.src.startsWith('/images/gallery/')) {
-      deleteUploadedFile(GALLERY_UPLOAD_DIR, img.src.split('/').pop() || '');
-    }
+    // Remove from Storage if it's a Storage URL (no-op for static assets).
+    await deleteImage(img.src);
     await this.repo.delete(id);
     return { message: 'Image deleted', id };
   }

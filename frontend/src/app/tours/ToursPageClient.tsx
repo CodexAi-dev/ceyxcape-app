@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { tourService } from '@/services/tours';
 import { Tour, TourFilters } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
@@ -67,7 +68,7 @@ function TourCard({ tour }: { tour: Tour }) {
     <div className="card-hover bg-white overflow-hidden shadow-card border border-gray-100 flex flex-col group">
       <div className="relative h-52 overflow-hidden">
         <Image
-          src={tour.image ? `/uploads/tours/${tour.image}` : '/images/default-tour.jpg'}
+          src={tourImageSrc(tour.image)}
           alt={tour.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
         {/* Category — top left */}
         <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#d4af37] text-white text-xs font-bold font-outfit">

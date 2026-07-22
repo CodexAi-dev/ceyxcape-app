@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import { adminService } from '@/services/admin';
 import { Tour } from '@/types';
 
@@ -70,7 +71,7 @@ export default function AdminToursPage() {
           {filtered.map((t) => (
             <div key={t.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex items-center gap-3 sm:gap-4">
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                <Image src={t.image ? `/uploads/tours/${t.image}` : '/images/default-tour.jpg'}
+                <Image src={tourImageSrc(t.image)}
                   alt={t.name} fill className="object-cover" sizes="80px" unoptimized />
               </div>
               <div className="min-w-0 flex-1">

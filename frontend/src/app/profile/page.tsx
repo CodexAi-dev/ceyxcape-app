@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { tourImageSrc } from '@/config/site';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -430,7 +431,7 @@ export default function ProfilePage() {
                         <div key={t.id} className="flex gap-3 border border-gray-200 rounded p-3 hover:border-[#003580]/30 hover:shadow-sm transition-all group">
                           <div className="relative w-20 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-100">
                             {t.image
-                              ? <Image src={`/uploads/tours/${t.image}`} alt={t.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300"/>
+                              ? <Image src={tourImageSrc(t.image)} alt={t.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300"/>
                               : <div className="w-full h-full bg-gray-100"/>
                             }
                           </div>

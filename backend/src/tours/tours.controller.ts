@@ -23,7 +23,7 @@ import { UpdateTourDto } from './dto/update-tour.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { imageUploadOptions, TOURS_UPLOAD_DIR } from '../common/upload.config';
+import { memoryUpload, uploadImage } from '../common/supabase-storage';
 
 @ApiTags('Tours')
 @Controller('tours')
@@ -101,14 +101,15 @@ export class ToursController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', imageUploadOptions(TOURS_UPLOAD_DIR)))
+  @UseInterceptors(FileInterceptor('file', memoryUpload))
   @ApiOperation({ summary: 'Upload/replace a tour main image (admin only)' })
-  uploadImage(
+  async uploadImage(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (!file) throw new BadRequestException('No image file provided');
-    return this.toursService.setImage(id, file.filename);
+    const url = await uploadImage('tours', file);
+    return this.toursService.setImage(id, url);
   }
 
   @Post(':id/gallery')
@@ -116,28 +117,32 @@ export class ToursController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('files', 12, imageUploadOptions(TOURS_UPLOAD_DIR)))
+  @UseInterceptors(FilesInterceptor('files', 12, memoryUpload))
   @ApiOperation({ summary: 'Add gallery images to a tour (admin only)' })
-  uploadGallery(
+  async uploadGallery(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('No image files provided');
     }
-    return this.toursService.addGalleryImages(id, files.map((f) => f.filename));
+    const urls = await Promise.all(files.map((f) => uploadImage('tours', f)));
+    return this.toursService.addGalleryImages(id, urls);
   }
 
-  @Delete(':id/gallery/:filename')
+  // Image URL passed as a query param (?image=<url>) since a full Storage URL
+  // can't sit in a path segment.
+  @Delete(':id/gallery')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove a gallery image from a tour (admin only)' })
   removeGalleryImage(
     @Param('id', ParseIntPipe) id: number,
-    @Param('filename') filename: string,
+    @Query('image') image: string,
   ) {
-    return this.toursService.removeGalleryImage(id, filename);
+    if (!image) throw new BadRequestException('No image specified');
+    return this.toursService.removeGalleryImage(id, image);
   }
 
   // ── Public single tour (keep last: ':id' catches everything else) ──

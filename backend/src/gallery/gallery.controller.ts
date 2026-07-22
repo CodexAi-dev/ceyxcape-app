@@ -18,7 +18,7 @@ import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { imageUploadOptions, GALLERY_UPLOAD_DIR } from '../common/upload.config';
+import { memoryUpload, uploadImage } from '../common/supabase-storage';
 
 @ApiTags('Gallery')
 @Controller('gallery')
@@ -36,14 +36,15 @@ export class GalleryController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', imageUploadOptions(GALLERY_UPLOAD_DIR)))
+  @UseInterceptors(FileInterceptor('file', memoryUpload))
   @ApiOperation({ summary: 'Upload a gallery image (admin only)' })
-  create(
+  async create(
     @Body() dto: CreateGalleryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (!file) throw new BadRequestException('No image file provided');
-    return this.galleryService.create(file.filename, dto);
+    const url = await uploadImage('gallery', file);
+    return this.galleryService.create(url, dto);
   }
 
   @Delete(':id')

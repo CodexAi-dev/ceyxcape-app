@@ -47,3 +47,13 @@ export function tourImageUrl(image?: string | null): string {
   if (image.startsWith('/')) return `${SITE_URL}${image}`;
   return `${API_ORIGIN}/uploads/tours/${image}`;
 }
+
+// Resolve a tour image to a src usable directly by next/image.
+// New uploads are stored as full Supabase Storage URLs (returned as-is);
+// legacy bare filenames fall back to the /uploads/tours proxy path.
+export function tourImageSrc(image?: string | null): string {
+  if (!image) return '/images/default-tour.jpg';
+  if (/^https?:\/\//.test(image)) return image;
+  if (image.startsWith('/')) return image;
+  return `/uploads/tours/${image}`;
+}
