@@ -1,4 +1,3 @@
-import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +10,12 @@ import { AuthModule } from './auth/auth.module';
 import { InquiriesModule } from './inquiries/inquiries.module';
 import { GalleryModule } from './gallery/gallery.module';
 import { AdminModule } from './admin/admin.module';
+// Import entities explicitly (not via a filesystem glob) so they still
+// register when the code is bundled into a serverless function on Vercel.
+import { Tour } from './tours/tour.entity';
+import { User } from './auth/entities/user.entity';
+import { Inquiry } from './inquiries/inquiry.entity';
+import { GalleryImage } from './gallery/gallery-image.entity';
 
 @Module({
   imports: [
@@ -41,9 +46,7 @@ import { AdminModule } from './admin/admin.module';
               }),
           // Supabase requires SSL; the pooler cert isn't in the local CA store.
           ssl: isProd || url ? { rejectUnauthorized: false } : false,
-          // Resolve entities relative to THIS compiled file so it works no
-          // matter which directory the app is launched from.
-          entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
+          entities: [Tour, User, Inquiry, GalleryImage],
           // Never auto-sync in prod; schema is created via the migrate script.
           synchronize: !isProd && !url,
           logging: false,
