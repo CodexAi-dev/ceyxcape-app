@@ -7,21 +7,21 @@ import { imageFileFilter, multerLimits } from './validators/file-upload.validato
 // Images are stored in a public Supabase Storage bucket. Uploaded files are
 // kept in memory (serverless has no writable disk) then streamed to Storage,
 // and we persist the returned public URL in the database.
-const BUCKET = process.env.SUPABASE_BUCKET || 'media';
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+// Env is read lazily (inside getClient) so it resolves AFTER ConfigModule has
+// loaded .env — reading it at import time would run before that and be empty.
+const bucket = () => process.env.SUPABASE_BUCKET || 'media';
 
 let client: SupabaseClient | null = null;
 function getClient(): SupabaseClient {
   if (!client) {
-    if (!SUPABASE_URL || !SERVICE_KEY) {
+    const url = process.env.SUPABASE_URL || '';
+    const key = process.env.SUPABASE_SERVICE_KEY || '';
+    if (!url || !key) {
       throw new Error(
         'Supabase Storage not configured — set SUPABASE_URL and SUPABASE_SERVICE_KEY',
       );
     }
-    client = createClient(SUPABASE_URL, SERVICE_KEY, {
-      auth: { persistSession: false },
-    });
+    client = createClient(url, key, { auth: { persistSession: false } });
   }
   return client;
 }
@@ -49,25 +49,25 @@ export async function uploadImage(
 ): Promise<string> {
   const objectPath = `${folder}/${uniqueName(file.originalname)}`;
   const { error } = await getClient()
-    .storage.from(BUCKET)
+    .storage.from(bucket())
     .upload(objectPath, file.buffer, {
       contentType: file.mimetype || 'image/jpeg',
       upsert: false,
     });
   if (error) throw new Error(`Storage upload failed: ${error.message}`);
-  return getClient().storage.from(BUCKET).getPublicUrl(objectPath).data
+  return getClient().storage.from(bucket()).getPublicUrl(objectPath).data
     .publicUrl;
 }
 
 // Best-effort delete. Ignores non-Storage URLs (legacy/static paths).
 export async function deleteImage(publicUrl?: string | null): Promise<void> {
   if (!publicUrl) return;
-  const marker = `/storage/v1/object/public/${BUCKET}/`;
+  const marker = `/storage/v1/object/public/${bucket()}/`;
   const i = publicUrl.indexOf(marker);
   if (i === -1) return;
   const objectPath = publicUrl.slice(i + marker.length);
   try {
-    await getClient().storage.from(BUCKET).remove([objectPath]);
+    await getClient().storage.from(bucket()).remove([objectPath]);
   } catch {
     /* best effort — never throw on delete */
   }
