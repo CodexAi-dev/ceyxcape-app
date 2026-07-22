@@ -22,21 +22,35 @@ import { AdminModule } from './admin/admin.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 3306),
-        username: configService.get<string>('DB_USER', 'root'),
-        password: configService.get<string>('DB_PASS', ''),
-        database: configService.get<string>('DB_NAME', 'ceyxcape_new'),
-        // Resolve entities relative to THIS compiled file so it works no
-        // matter which directory the app is launched from (e.g. cPanel).
-        entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-        synchronize: process.env.NODE_ENV !== 'production',
-        logging: false,
-        charset: 'utf8mb4',
-        timezone: '+00:00',
-      }),
+      useFactory: (configService: ConfigService) => {
+        // Prefer a single Postgres connection string (Supabase gives one).
+        // Use the pooler URL (port 6543, transaction mode) on serverless.
+        const url = configService.get<string>('DATABASE_URL');
+        const isProd = process.env.NODE_ENV === 'production';
+
+        return {
+          type: 'postgres' as const,
+          ...(url
+            ? { url }
+            : {
+                host: configService.get<string>('DB_HOST', 'localhost'),
+                port: configService.get<number>('DB_PORT', 5432),
+                username: configService.get<string>('DB_USER', 'postgres'),
+                password: configService.get<string>('DB_PASS', ''),
+                database: configService.get<string>('DB_NAME', 'postgres'),
+              }),
+          // Supabase requires SSL; the pooler cert isn't in the local CA store.
+          ssl: isProd || url ? { rejectUnauthorized: false } : false,
+          // Resolve entities relative to THIS compiled file so it works no
+          // matter which directory the app is launched from.
+          entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
+          // Never auto-sync in prod; schema is created via the migrate script.
+          synchronize: !isProd && !url,
+          logging: false,
+          // Serverless: keep the pool tiny and lean on Supabase's pgbouncer.
+          extra: { max: isProd ? 1 : 10 },
+        };
+      },
     }),
 
     ToursModule,

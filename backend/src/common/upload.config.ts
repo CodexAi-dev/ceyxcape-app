@@ -23,7 +23,14 @@ export const GALLERY_UPLOAD_DIR =
   path.join(FRONTEND_PUBLIC, 'images', 'gallery');
 
 function ensureDir(dir: string) {
-  fs.mkdirSync(dir, { recursive: true });
+  // Never throw: on a read-only/serverless filesystem (e.g. Vercel) mkdir
+  // fails, and this runs at import time via the controller decorators — an
+  // uncaught error there would crash the whole app on cold start.
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch {
+    /* read-only FS — disk uploads handled by the Supabase Storage path */
+  }
 }
 
 // Build multer options that store images in `dir` with a safe random filename.
